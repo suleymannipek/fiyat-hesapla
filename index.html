@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Fiyat Hesapla Pro</title>
 
-  <!-- Uygulama Simgeleri (Favicon & Mobil Ana Ekran) -->
-  <link rel="icon" type="image/x-icon" href="icon.png">
-  <link rel="shortcut icon" href="icon.png" type="image/x-icon">
-  <link rel="apple-touch-icon" href="icon.png">
+  <!-- Uygulama Simgeleri (Doğrudan depodaki icon.ico dosyasına bağlı) -->
+  <link rel="icon" type="image/x-icon" href="icon.ico?v=3">
+  <link rel="shortcut icon" href="icon.ico?v=3" type="image/x-icon">
+  <link rel="apple-touch-icon" href="icon.ico?v=3">
 
   <style>
     /* ================= TEMA TANIMLARI ================= */
@@ -119,6 +119,7 @@
       object-fit: cover;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       border: 1px solid rgba(255, 255, 255, 0.15);
+      display: inline-block;
     }
 
     .header-actions {
@@ -144,7 +145,6 @@
       gap: 8px;
     }
 
-    /* Üst Seçim Satırı (Tek parça ve ferah) */
     .top-select-row {
       display: flex;
       width: 100%;
@@ -171,7 +171,6 @@
       border-color: #38BDF8;
     }
 
-    /* 2 Sütunlu Orta Alan */
     .middle-grid {
       display: grid;
       grid-template-columns: 1.3fr 1fr;
@@ -253,7 +252,6 @@
       cursor: pointer;
     }
 
-    /* Misafir Kartı */
     .guest-row {
       display: flex;
       align-items: center;
@@ -303,7 +301,6 @@
       accent-color: #0284C7;
     }
 
-    /* Butonlar */
     .button-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -339,7 +336,6 @@
     .btn-hesapla { background: linear-gradient(135deg, #16A34A, #15803D); }
     .btn-temizle { background: linear-gradient(135deg, #DC2626, #B91C1C); grid-column: span 2; }
 
-    /* Gösterge Alanı */
     .result-display {
       background: var(--result-bg);
       border: 1.5px solid var(--result-border);
@@ -403,7 +399,7 @@
     <div id="odaModulu">
       <div class="title-bar">
         <div class="title-left">
-          <img src="icon.png" alt="Logo" class="app-custom-icon" onerror="this.style.display='none'">
+          <img src="icon.ico?v=3" alt="Logo" class="app-custom-icon">
           <span>Oda Hesaplama</span>
         </div>
         <div class="header-actions">
@@ -482,7 +478,7 @@
     <div id="villaModulu" class="hidden">
       <div class="title-bar">
         <div class="title-left">
-          <img src="icon.png" alt="Logo" class="app-custom-icon" onerror="this.style.display='none'">
+          <img src="icon.ico?v=3" alt="Logo" class="app-custom-icon">
           <span>Villa Hesaplama</span>
         </div>
         <div class="header-actions">
