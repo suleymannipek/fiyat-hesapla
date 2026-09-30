@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Fiyat Hesapla Pro</title>
 
-  <!-- Uygulama Simgeleri (Doğrudan depodaki icon.ico dosyasına bağlı) -->
-  <link rel="icon" type="image/x-icon" href="icon.ico?v=3">
-  <link rel="shortcut icon" href="icon.ico?v=3" type="image/x-icon">
-  <link rel="apple-touch-icon" href="icon.ico?v=3">
+  <!-- Uygulama Simgeleri -->
+  <link rel="icon" type="image/x-icon" href="icon.ico?v=4">
+  <link rel="shortcut icon" href="icon.ico?v=4" type="image/x-icon">
+  <link rel="apple-touch-icon" href="icon.ico?v=4">
 
   <style>
     /* ================= TEMA TANIMLARI ================= */
@@ -93,7 +93,6 @@
       flex-direction: column;
     }
 
-    /* Üst Başlık Barı */
     .title-bar {
       background: var(--title-bg);
       padding: 10px 14px;
@@ -399,7 +398,7 @@
     <div id="odaModulu">
       <div class="title-bar">
         <div class="title-left">
-          <img src="icon.ico?v=3" alt="Logo" class="app-custom-icon">
+          <img src="icon.ico?v=4" alt="Logo" class="app-custom-icon">
           <span>Oda Hesaplama</span>
         </div>
         <div class="header-actions">
@@ -478,7 +477,7 @@
     <div id="villaModulu" class="hidden">
       <div class="title-bar">
         <div class="title-left">
-          <img src="icon.ico?v=3" alt="Logo" class="app-custom-icon">
+          <img src="icon.ico?v=4" alt="Logo" class="app-custom-icon">
           <span>Villa Hesaplama</span>
         </div>
         <div class="header-actions">
@@ -634,9 +633,14 @@
         konteyner.appendChild(row);
       }
 
+      // Elle girilen fiyatları dizide güncelle
       document.querySelectorAll('.p-fiyat').forEach(inp => {
-        inp.oninput = (e) => periyotFiyatlari[e.target.dataset.idx] = parseFloat(e.target.value) || 0;
+        inp.oninput = (e) => {
+          periyotFiyatlari[e.target.dataset.idx] = parseFloat(e.target.value) || 0;
+        };
       });
+
+      // Elle girilen geceleri dizide güncelle
       document.querySelectorAll('.p-gece').forEach(inp => {
         inp.oninput = (e) => {
           periyotGeceleri[e.target.dataset.idx] = e.target.value;
@@ -784,6 +788,7 @@
       const ucr = document.getElementById('chk012Ucretsiz').checked;
       let katsayi = (!ucr && (pax / 2.0 > 1.0)) ? (pax / 2.0) : 1.0;
 
+      // O an ekranda güncel girilmiş olan periyotFiyatlari kullanılır
       const res = tekilOdaHesapla(periyotFiyatlari, katsayi);
       const ortalama = res.topGece > 0 ? (res.topTutar / res.topGece) : 0;
       
@@ -808,8 +813,11 @@
       const ucr = document.getElementById('chk012Ucretsiz').checked;
       let katsayi = (!ucr && (pax / 2.0 > 1.0)) ? (pax / 2.0) : 1.0;
 
-      const stdFiyatlar = odaVerileri['Standart Suite'] || periyotFiyatlari;
-      const havFiyatlar = odaVerileri['Havuzlu Suite'] || [];
+      // 1. Standart oda: Ekranda elle düzenlenmiş güncel kutulardan alınır
+      const stdFiyatlar = [...periyotFiyatlari];
+
+      // 2. Havuzlu Suite: Standart fiyatların her birine +500 TL eklenerek dinamik üretilir
+      const havFiyatlar = stdFiyatlar.map(f => (f > 0 ? f + 500 : 0));
 
       const stdRes = tekilOdaHesapla(stdFiyatlar, katsayi);
       const havRes = tekilOdaHesapla(havFiyatlar, katsayi);
@@ -819,11 +827,13 @@
       const stdOrt = stdRes.topGece > 0 ? (stdRes.topTutar / stdRes.topGece) : 0;
       const havOrt = havRes.topGece > 0 ? (havRes.topTutar / havRes.topGece) : 0;
 
+      // Arayüzde hem toplam hem ortalamayı göster
       document.getElementById('odaSonuc').innerHTML = `
         <div class="res-line"><span>1️⃣ Standart:</span> <span>${Math.round(stdRes.topTutar).toLocaleString('tr-TR')} TL | Ort: ${Math.round(stdOrt).toLocaleString('tr-TR')} TL</span></div>
         <div class="res-line"><span>2️⃣ Havuzlu:</span> <span>${Math.round(havRes.topTutar).toLocaleString('tr-TR')} TL | Ort: ${Math.round(havOrt).toLocaleString('tr-TR')} TL</span></div>
       `;
 
+      // Panoya kopyalanan metin (Müşteriye giden - ortalama içermez)
       const stdTutar = Math.round(stdRes.topTutar).toLocaleString('tr-TR');
       const havTutar = Math.round(havRes.topTutar).toLocaleString('tr-TR');
       const misafir = misafirMetniOlustur('oda');
@@ -929,11 +939,16 @@
     }
 
     function villaCiftTeklif() {
-      const lux = villaVerileri['Luxury Villa'] || { fiyatlar: {}, degisken: 0 };
-      const del = villaVerileri['Deluxe Villa'] || { fiyatlar: {}, degisken: 0 };
+      // Villada da kutulardaki fiyatlar baz alınır
+      const f1 = parseFloat(document.getElementById('vFiyat1').value) || 0;
+      const f2 = parseFloat(document.getElementById('vFiyat2').value) || 0;
+      const f3 = parseFloat(document.getElementById('vFiyat3').value) || 0;
 
-      const luxRes = tekilVillaHesapla(lux.fiyatlar['fiyat1'] || 0, lux.fiyatlar['fiyat2'] || 0, lux.fiyatlar['fiyat3'] || 0, lux.degisken);
-      const delRes = tekilVillaHesapla(del.fiyatlar['fiyat1'] || 0, del.fiyatlar['fiyat2'] || 0, del.fiyatlar['fiyat3'] || 0, del.degisken);
+      const lux = villaVerileri['Luxury Villa'] || { degisken: 0 };
+      const del = villaVerileri['Deluxe Villa'] || { degisken: 0 };
+
+      const luxRes = tekilVillaHesapla(f1, f2, f3, lux.degisken);
+      const delRes = tekilVillaHesapla(f1, f2, f3, del.degisken);
 
       if (luxRes.topGece === 0) return;
 
