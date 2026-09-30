@@ -6,9 +6,9 @@
   <title>Fiyat Hesapla Pro</title>
 
   <!-- Uygulama Simgeleri -->
-  <link rel="icon" type="image/x-icon" href="icon.ico?v=6">
-  <link rel="shortcut icon" href="icon.ico?v=6" type="image/x-icon">
-  <link rel="apple-touch-icon" href="icon.ico?v=6">
+  <link rel="icon" type="image/x-icon" href="icon.ico?v=7">
+  <link rel="shortcut icon" href="icon.ico?v=7" type="image/x-icon">
+  <link rel="apple-touch-icon" href="icon.ico?v=7">
 
   <style>
     /* ================= TEMA TANIMLARI ================= */
@@ -425,7 +425,7 @@
     <div id="odaModulu">
       <div class="title-bar">
         <div class="title-left">
-          <img src="icon.ico?v=6" alt="Logo" class="app-custom-icon">
+          <img src="icon.ico?v=7" alt="Logo" class="app-custom-icon">
           <span>Oda Hesaplama</span>
         </div>
         <div class="header-actions">
@@ -504,7 +504,7 @@
     <div id="villaModulu" class="hidden">
       <div class="title-bar">
         <div class="title-left">
-          <img src="icon.ico?v=6" alt="Logo" class="app-custom-icon">
+          <img src="icon.ico?v=7" alt="Logo" class="app-custom-icon">
           <span>Villa Hesaplama</span>
         </div>
         <div class="header-actions">
@@ -649,7 +649,7 @@
         document.getElementById('btnBaz3').classList.add('active');
         document.getElementById('btnBaz2').classList.remove('active');
       }
-      villaHesapla(false);
+      // Otomatik hesaplama çağrısı kaldırıldı
     }
 
     /* ================= HESAPLAMA VE VERİ İŞLEMLERİ ================= */
@@ -928,16 +928,11 @@
       return pax;
     }
 
+    // Otomatik hesaplama kaldırıldı, sadece PAX güncellenir
     ['txtVillaYetiskin', 'txtVillaCocuk712', 'txtVillaCocuk06'].forEach(id => {
-      document.getElementById(id).addEventListener('input', () => {
-        villaPaxHesapla();
-        villaHesapla(false);
-      });
+      document.getElementById(id).addEventListener('input', villaPaxHesapla);
     });
-    document.getElementById('chkVilla012Ucretsiz').addEventListener('change', () => {
-      villaPaxHesapla();
-      villaHesapla(false);
-    });
+    document.getElementById('chkVilla012Ucretsiz').addEventListener('change', villaPaxHesapla);
 
     function villaGeceToplamiGuncelle() {
       const g1 = parseInt(document.getElementById('vGece1').value) || 0;
@@ -948,17 +943,10 @@
       return top;
     }
 
-    document.querySelectorAll('.v-gece, .v-fiyat, #vDegisken').forEach(inp => {
-      inp.addEventListener('input', () => {
-        villaGeceToplamiGuncelle();
-        villaHesapla(false);
-      });
+    document.querySelectorAll('.v-gece').forEach(inp => {
+      inp.addEventListener('input', villaGeceToplamiGuncelle);
     });
 
-    /* PATRONUN KURALINA GÖRE HESAPLAMA MOTORU:
-       Kişi Sayısı Baz Kişiyi (2 veya 3) aşıyorsa:
-       Gecelik Fiyat = [Periyot Fiyatı + (Aşan Kişi * Değişken)] * Gece
-    */
     function tekilVillaHesapla(f1, f2, f3, degiskenBirim) {
       const g1 = parseInt(document.getElementById('vGece1').value) || 0;
       const g2 = parseInt(document.getElementById('vGece2').value) || 0;
@@ -969,19 +957,16 @@
       const c712 = parseInt(document.getElementById('txtVillaCocuk712').value) || 0;
       const ucr = document.getElementById('chkVilla012Ucretsiz').checked;
 
-      // Toplam Kişi Hesabı
       let toplamKisi = y;
       if (!ucr && c712 > 0) {
         toplamKisi += (c712 * 0.5);
       }
 
-      // Seçili baz (2 veya 3) üzerinden aşan kişi
       let asanKisi = 0;
       if (toplamKisi > seciliBazKisi) {
         asanKisi = toplamKisi - seciliBazKisi;
       }
 
-      // Her periyodun gecelik fiyatı: Periyot Fiyatı + (Aşan Kişi * Değişken Fiyat)
       const gunlukEk = asanKisi * degiskenBirim;
       
       let topTutar = 0;
@@ -1019,20 +1004,39 @@
     }
 
     function villaCiftTeklif() {
-      const f1 = parseFloat(document.getElementById('vFiyat1').value) || 0;
-      const f2 = parseFloat(document.getElementById('vFiyat2').value) || 0;
-      const f3 = parseFloat(document.getElementById('vFiyat3').value) || 0;
-      const degisken = parseFloat(document.getElementById('vDegisken').value) || 0;
+      // Ekranda seçili olan villanın güncel değerleri
+      const seciliVilla = document.getElementById('villaTipi').value;
+      const f1Ekran = parseFloat(document.getElementById('vFiyat1').value) || 0;
+      const f2Ekran = parseFloat(document.getElementById('vFiyat2').value) || 0;
+      const f3Ekran = parseFloat(document.getElementById('vFiyat3').value) || 0;
+      const degiskenEkran = parseFloat(document.getElementById('vDegisken').value) || 0;
 
-      // Çift teklifte o anki ekrandaki fiyatlar ve patronun seçtiği baz baz alınır
-      const luxRes = tekilVillaHesapla(f1, f2, f3, degisken);
-      const delRes = tekilVillaHesapla(f1, f2, f3, degisken);
+      // Dosyadan Luxury ve Deluxe verilerini dinamik eşleştir
+      const luxData = villaVerileri['Luxury Villa'] || { fiyatlar: {}, degisken: 0 };
+      const delData = villaVerileri['Deluxe Villa'] || { fiyatlar: {}, degisken: 0 };
 
-      if (luxRes.topGece === 0) return;
+      // Luxury Fiyatları: Seçili olan buysa ekrandaki elle yazılanı al, değilse dosyadan al
+      let lF1 = (seciliVilla === 'Luxury Villa') ? f1Ekran : (luxData.fiyatlar['fiyat1'] || 0);
+      let lF2 = (seciliVilla === 'Luxury Villa') ? f2Ekran : (luxData.fiyatlar['fiyat2'] || 0);
+      let lF3 = (seciliVilla === 'Luxury Villa') ? f3Ekran : (luxData.fiyatlar['fiyat3'] || 0);
+      let lDeg = (seciliVilla === 'Luxury Villa') ? degiskenEkran : (luxData.degisken || 0);
 
-      const luxOrt = luxRes.topGece > 0 ? (luxRes.topTutar / luxRes.topGece) : 0;
-      const delOrt = delRes.topGece > 0 ? (delRes.topTutar / delRes.topGece) : 0;
+      // Deluxe Fiyatları: Seçili olan buysa ekrandaki elle yazılanı al, değilse dosyadan al
+      let dF1 = (seciliVilla === 'Deluxe Villa') ? f1Ekran : (delData.fiyatlar['fiyat1'] || 0);
+      let dF2 = (seciliVilla === 'Deluxe Villa') ? f2Ekran : (delData.fiyatlar['fiyat2'] || 0);
+      let dF3 = (seciliVilla === 'Deluxe Villa') ? f3Ekran : (delData.fiyatlar['fiyat3'] || 0);
+      let dDeg = (seciliVilla === 'Deluxe Villa') ? degiskenEkran : (delData.degisken || 0);
 
+      const luxRes = tekilVillaHesapla(lF1, lF2, lF3, lDeg);
+      const delRes = tekilVillaHesapla(dF1, dF2, dF3, dDeg);
+
+      if (luxRes.topGece === 0 && delRes.topGece === 0) return;
+
+      const topGece = luxRes.topGece || delRes.topGece;
+      const luxOrt = topGece > 0 ? (luxRes.topTutar / topGece) : 0;
+      const delOrt = topGece > 0 ? (delRes.topTutar / topGece) : 0;
+
+      // Arayüzde her iki villanın toplam ve ortalamasını göster
       document.getElementById('villaSonuc').innerHTML = `
         <div class="res-line"><span>1️⃣ Luxury:</span> <span>${Math.round(luxRes.topTutar).toLocaleString('tr-TR')} TL | Ort: ${Math.round(luxOrt).toLocaleString('tr-TR')} TL</span></div>
         <div class="res-line"><span>2️⃣ Deluxe:</span> <span>${Math.round(delRes.topTutar).toLocaleString('tr-TR')} TL | Ort: ${Math.round(delOrt).toLocaleString('tr-TR')} TL</span></div>
@@ -1043,7 +1047,7 @@
       const misafir = misafirMetniOlustur('villa');
       const ucr = document.getElementById('chkVilla012Ucretsiz').checked;
 
-      let metin = `🏡 VİLLA REZERVASYON TEKLİF SEÇENEKLERİ\n📅 Konaklama: ${luxRes.topGece} Gece\n👥 Misafir: ${misafir}\n\n1️⃣ Luxury Villa: ${luxTutar} TL\n2️⃣ Deluxe Villa: ${delTutar} TL`;
+      let metin = `🏡 VİLLA REZERVASYON TEKLİF SEÇENEKLERİ\n📅 Konaklama: ${topGece} Gece\n👥 Misafir: ${misafir}\n\n1️⃣ Luxury Villa: ${luxTutar} TL\n2️⃣ Deluxe Villa: ${delTutar} TL`;
       if (ucr) {
         metin += `\n\n🎁 Özel Fırsat: 0-12 Yaş Çocuk Konaklaması Ücretsizdir.`;
       }
@@ -1057,7 +1061,7 @@
       document.getElementById('txtVillaCocuk712').value = '0';
       document.getElementById('txtVillaCocuk06').value = '0';
       document.getElementById('villaSonuc').innerHTML = `<div class="res-line res-line-single">Top: 0 TL | Ort: 0 TL</div>`;
-      bazSec(2); // Varsayılana (2 Kişi) döner
+      bazSec(2);
       villaGeceToplamiGuncelle();
       villaPaxHesapla();
       villaSecildi();
