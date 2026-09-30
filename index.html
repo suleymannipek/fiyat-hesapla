@@ -6,9 +6,9 @@
   <title>Fiyat Hesapla Pro</title>
 
   <!-- Uygulama Simgeleri -->
-  <link rel="icon" type="image/x-icon" href="icon.ico?v=4">
-  <link rel="shortcut icon" href="icon.ico?v=4" type="image/x-icon">
-  <link rel="apple-touch-icon" href="icon.ico?v=4">
+  <link rel="icon" type="image/x-icon" href="icon.ico?v=5">
+  <link rel="shortcut icon" href="icon.ico?v=5" type="image/x-icon">
+  <link rel="apple-touch-icon" href="icon.ico?v=5">
 
   <style>
     /* ================= TEMA TANIMLARI ================= */
@@ -398,7 +398,7 @@
     <div id="odaModulu">
       <div class="title-bar">
         <div class="title-left">
-          <img src="icon.ico?v=4" alt="Logo" class="app-custom-icon">
+          <img src="icon.ico?v=5" alt="Logo" class="app-custom-icon">
           <span>Oda Hesaplama</span>
         </div>
         <div class="header-actions">
@@ -414,7 +414,7 @@
 
         <div class="middle-grid">
           <div class="box-panel">
-            <div class="box-title" id="lblPeriyotBaslik">Fiyat/Gece (1-5)</div>
+            <div class="box-title" id="lblPeriyotBaslik">Kişi Başı/Gece (1-5)</div>
             <div class="period-header">
               <span>FİYAT</span>
               <span>GECE</span>
@@ -477,7 +477,7 @@
     <div id="villaModulu" class="hidden">
       <div class="title-bar">
         <div class="title-left">
-          <img src="icon.ico?v=4" alt="Logo" class="app-custom-icon">
+          <img src="icon.ico?v=5" alt="Logo" class="app-custom-icon">
           <span>Villa Hesaplama</span>
         </div>
         <div class="header-actions">
@@ -493,7 +493,7 @@
 
         <div class="middle-grid">
           <div class="box-panel">
-            <div class="box-title">Sezon & Fiyat</div>
+            <div class="box-title">Sezon & Fiyat (2 Kişi)</div>
             <div class="period-header">
               <span>FİYAT</span>
               <span>GECE</span>
@@ -618,7 +618,7 @@
       konteyner.innerHTML = '';
       const baslangic = aktifSayfa === 1 ? 0 : 5;
 
-      document.getElementById('lblPeriyotBaslik').innerText = aktifSayfa === 1 ? 'Fiyat/Gece (1-5)' : 'Fiyat/Gece (6-10)';
+      document.getElementById('lblPeriyotBaslik').innerText = aktifSayfa === 1 ? 'Kişi Başı/Gece (1-5)' : 'Kişi Başı/Gece (6-10)';
       document.getElementById('btnSayfa').innerText = aktifSayfa === 1 ? '>>' : '<<';
 
       for (let i = 0; i < 5; i++) {
@@ -682,7 +682,7 @@
           if (satir.startsWith('[') && satir.endsWith(']')) {
             aktifBolum = satir.substring(1, satir.length - 1).trim();
             if (aktifBolum.toLowerCase().includes('villa')) {
-              villaVerileri[aktifBolum] = { fiyatlar: {}, degisken: 0 };
+              villaVerileri[aktifBolum] = { fiyatlar: {}, degisken: 0, ekKisi: 500 };
             } else {
               odaVerileri[aktifBolum] = Array(10).fill(0);
             }
@@ -693,6 +693,7 @@
             if (aktifBolum.toLowerCase().includes('villa')) {
               if (anahtar.startsWith('fiyat')) villaVerileri[aktifBolum].fiyatlar[anahtar] = sayi;
               if (anahtar === 'degisken') villaVerileri[aktifBolum].degisken = sayi;
+              if (anahtar === 'ekkisi') villaVerileri[aktifBolum].ekKisi = sayi;
             } else {
               if (anahtar.startsWith('periyot')) {
                 const s = parseInt(anahtar.replace('periyot', '')) - 1;
@@ -741,6 +742,7 @@
       const c712 = parseFloat(document.getElementById('txtCocuk712').value) || 0;
       const ucr = document.getElementById('chk012Ucretsiz').checked;
 
+      // 0-12 yaş ücretsizse çocuklar pax sayılmaz, sadece yetişkinler hesaplanır
       let pax = ucr ? y : y + (c712 * 0.5);
       document.getElementById('lblPax').innerText = 'PAX: ' + pax.toFixed(1);
       return pax;
@@ -769,7 +771,8 @@
       return parcalar.join(', ');
     }
 
-    function tekilOdaHesapla(fiyatDizisi, paxKatsayisi) {
+    // Fiyat doğrudan Kişi Başı (Pax) olarak hesaplanır: Fiyat * Gece * PAX
+    function tekilOdaHesapla(fiyatDizisi, paxDegeri) {
       let topGece = 0;
       let topTutar = 0;
       for (let i = 0; i < 10; i++) {
@@ -777,7 +780,7 @@
         const g = parseInt(periyotGeceleri[i]) || 0;
         if (f > 0 && g > 0) {
           topGece += g;
-          topTutar += (f * g * paxKatsayisi);
+          topTutar += (f * g * paxDegeri);
         }
       }
       return { topTutar, topGece };
@@ -786,10 +789,9 @@
     function odaHesapla(kopyala = false) {
       const pax = paxHesapla();
       const ucr = document.getElementById('chk012Ucretsiz').checked;
-      let katsayi = (!ucr && (pax / 2.0 > 1.0)) ? (pax / 2.0) : 1.0;
 
-      // O an ekranda güncel girilmiş olan periyotFiyatlari kullanılır
-      const res = tekilOdaHesapla(periyotFiyatlari, katsayi);
+      // Periyottaki kutularda ne yazıyorsa o fiyat x PAX x Gece
+      const res = tekilOdaHesapla(periyotFiyatlari, pax);
       const ortalama = res.topGece > 0 ? (res.topTutar / res.topGece) : 0;
       
       document.getElementById('odaSonuc').innerHTML = `
@@ -811,29 +813,34 @@
     function odaCiftTeklif() {
       const pax = paxHesapla();
       const ucr = document.getElementById('chk012Ucretsiz').checked;
-      let katsayi = (!ucr && (pax / 2.0 > 1.0)) ? (pax / 2.0) : 1.0;
+      const secilenOda = document.getElementById('odaTipi').value.toLowerCase();
 
-      // 1. Standart oda: Ekranda elle düzenlenmiş güncel kutulardan alınır
-      const stdFiyatlar = [...periyotFiyatlari];
+      let stdFiyatlar = [];
+      let havFiyatlar = [];
 
-      // 2. Havuzlu Suite: Standart fiyatların her birine +500 TL eklenerek dinamik üretilir
-      const havFiyatlar = stdFiyatlar.map(f => (f > 0 ? f + 500 : 0));
+      // Eğer şu an Havuzlu oda seçiliyse, standart/küvetli oda onun 500 TL EKSİĞİDİR
+      if (secilenOda.includes('havuz')) {
+        havFiyatlar = [...periyotFiyatlari];
+        stdFiyatlar = havFiyatlar.map(f => (f > 500 ? f - 500 : f));
+      } else {
+        // Standart/Küvetli seçiliyse, Havuzlu oda onun 500 TL FAZLASIDIR
+        stdFiyatlar = [...periyotFiyatlari];
+        havFiyatlar = stdFiyatlar.map(f => (f > 0 ? f + 500 : 0));
+      }
 
-      const stdRes = tekilOdaHesapla(stdFiyatlar, katsayi);
-      const havRes = tekilOdaHesapla(havFiyatlar, katsayi);
+      const stdRes = tekilOdaHesapla(stdFiyatlar, pax);
+      const havRes = tekilOdaHesapla(havFiyatlar, pax);
 
       if (stdRes.topGece === 0) return;
 
       const stdOrt = stdRes.topGece > 0 ? (stdRes.topTutar / stdRes.topGece) : 0;
       const havOrt = havRes.topGece > 0 ? (havRes.topTutar / havRes.topGece) : 0;
 
-      // Arayüzde hem toplam hem ortalamayı göster
       document.getElementById('odaSonuc').innerHTML = `
-        <div class="res-line"><span>1️⃣ Standart:</span> <span>${Math.round(stdRes.topTutar).toLocaleString('tr-TR')} TL | Ort: ${Math.round(stdOrt).toLocaleString('tr-TR')} TL</span></div>
+        <div class="res-line"><span>1️⃣ Standart/Küvetli:</span> <span>${Math.round(stdRes.topTutar).toLocaleString('tr-TR')} TL | Ort: ${Math.round(stdOrt).toLocaleString('tr-TR')} TL</span></div>
         <div class="res-line"><span>2️⃣ Havuzlu:</span> <span>${Math.round(havRes.topTutar).toLocaleString('tr-TR')} TL | Ort: ${Math.round(havOrt).toLocaleString('tr-TR')} TL</span></div>
       `;
 
-      // Panoya kopyalanan metin (Müşteriye giden - ortalama içermez)
       const stdTutar = Math.round(stdRes.topTutar).toLocaleString('tr-TR');
       const havTutar = Math.round(havRes.topTutar).toLocaleString('tr-TR');
       const misafir = misafirMetniOlustur('oda');
@@ -858,7 +865,7 @@
       panoyuTemizle();
     }
 
-    // VİLLA MODÜLÜ
+    // ================= VİLLA MODÜLÜ =================
     function villaSecildi() {
       const secilen = document.getElementById('villaTipi').value;
       const v = villaVerileri[secilen];
@@ -898,13 +905,36 @@
       inp.addEventListener('input', villaGeceToplamiGuncelle);
     });
 
-    function tekilVillaHesapla(f1, f2, f3, degisken) {
+    // Villa Mantığı: Fiyat 2 kişilik fiyattır. 2'den fazla her kişi için gecelik ilave eklenir.
+    function tekilVillaHesapla(f1, f2, f3, degisken, ekKisiBirimFiyati = 500) {
       const g1 = parseInt(document.getElementById('vGece1').value) || 0;
       const g2 = parseInt(document.getElementById('vGece2').value) || 0;
       const g3 = parseInt(document.getElementById('vGece3').value) || 0;
       const topGece = g1 + g2 + g3;
 
+      const y = parseInt(document.getElementById('txtVillaYetiskin').value) || 0;
+      const c712 = parseInt(document.getElementById('txtVillaCocuk712').value) || 0;
+      const formEkKisi = parseInt(document.getElementById('txtVillaEkKisi').value) || 0;
+      const ucr = document.getElementById('chkVilla012Ucretsiz').checked;
+
+      // 2 kişinin üzerindeki ilave kişi sayısı
+      let ilaveKisi = formEkKisi;
+      if (y > 2) {
+        ilaveKisi += (y - 2);
+      }
+      if (!ucr && c712 > 0) {
+        ilaveKisi += (c712 * 0.5);
+      }
+
+      // 2 Kişilik Baz Tutar
       let topTutar = (f1 * g1) + (f2 * g2) + (f3 * g3);
+
+      // Ek Kişi Ücreti İlavesi
+      if (ilaveKisi > 0 && topGece > 0) {
+        topTutar += (ilaveKisi * ekKisiBirimFiyati * topGece);
+      }
+
+      // 7 gece altı kısa konaklama temizlik ücreti
       if (topGece > 0 && topGece < 7 && degisken > 0) {
         topTutar += degisken;
       }
@@ -918,8 +948,9 @@
 
       const secilen = document.getElementById('villaTipi').value;
       const degisken = (villaVerileri[secilen] && villaVerileri[secilen].degisken) || 0;
+      const ekKisiFiyati = (villaVerileri[secilen] && villaVerileri[secilen].ekKisi) || 500;
 
-      const res = tekilVillaHesapla(f1, f2, f3, degisken);
+      const res = tekilVillaHesapla(f1, f2, f3, degisken, ekKisiFiyati);
       const ortalama = res.topGece > 0 ? (res.topTutar / res.topGece) : 0;
 
       document.getElementById('villaSonuc').innerHTML = `
@@ -939,16 +970,15 @@
     }
 
     function villaCiftTeklif() {
-      // Villada da kutulardaki fiyatlar baz alınır
       const f1 = parseFloat(document.getElementById('vFiyat1').value) || 0;
       const f2 = parseFloat(document.getElementById('vFiyat2').value) || 0;
       const f3 = parseFloat(document.getElementById('vFiyat3').value) || 0;
 
-      const lux = villaVerileri['Luxury Villa'] || { degisken: 0 };
-      const del = villaVerileri['Deluxe Villa'] || { degisken: 0 };
+      const lux = villaVerileri['Luxury Villa'] || { degisken: 0, ekKisi: 500 };
+      const del = villaVerileri['Deluxe Villa'] || { degisken: 0, ekKisi: 500 };
 
-      const luxRes = tekilVillaHesapla(f1, f2, f3, lux.degisken);
-      const delRes = tekilVillaHesapla(f1, f2, f3, del.degisken);
+      const luxRes = tekilVillaHesapla(f1, f2, f3, lux.degisken, lux.ekKisi || 500);
+      const delRes = tekilVillaHesapla(f1, f2, f3, del.degisken, del.ekKisi || 500);
 
       if (luxRes.topGece === 0) return;
 
