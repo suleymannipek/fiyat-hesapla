@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Fiyat Hesapla</title>
+  <style>
+    :root {
+      --primary: #1976D2;
+      --success: #2E7D32;
+      --danger: #D32F2F;
+      --accent: #0288D1;
+      --bg: #F4F6F9;
+      --card-bg: #FFFFFF;
+      --border: #CFD8DC;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+    }
+
+    .app-card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 440px;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: #ECEFF1;
+      padding: 12px 14px;
+      font-weight: 700;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .content {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 10px;
+    }
+
+    .section-box {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: #FAFAFA;
+    }
+
+    .scroll-box {
+      max-height: 235px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #455A64;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-line {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 5px;
+    }
+
+    .input-line label {
+      font-size: 12px;
+      font-weight: 600;
+      width: 20px;
+      color: #546E7A;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 7px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13.5px;
+      outline: none;
+      background: #FFF;
+      text-align: right;
+    }
+
+    select {
+      text-align: left;
+      font-weight: 600;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      margin-top: 6px;
+      cursor: pointer;
+    }
+
+    .checkbox-row input {
+      width: 17px;
+      height: 17px;
+    }
+
+    .pax-badge {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0D47A1;
+      margin-top: 6px;
+    }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    button {
+      padding: 11px;
+      font-size: 13px;
+      font-weight: 700;
+      border: none;
+      border-radius: 6px;
+      color: #FFF;
+      cursor: pointer;
+    }
+
+    button:active {
+      opacity: 0.85;
+      transform: scale(0.98);
+    }
+
+    .btn-teklif { background-color: var(--accent); }
+    .btn-hesapla { background-color: var(--success); }
+    .btn-detay { background-color: var(--primary); }
+    .btn-temizle { background-color: var(--danger); }
+
+    .result-box {
+      background: #ECEFF1;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 800;
+      color: #263238;
+      min-height: 42px;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .switch-link {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .version-text {
+      font-size: 11px;
+      color: #90A4AE;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-card">
+    
+    <!-- 1. ODA HESAPLAMA MODÜLÜ -->
+    <div id="odaModulu">
+      <div class="header">
+        <span>🏨 Oda Hesaplama</span>
+      </div>
+      <div class="content">
+        <select id="odaTipi" onchange="odaSecildi()"></select>
+
+        <div class="row-2">
+          <!-- 10 Periyotluk Fiyat & Gece -->
+          <div class="section-box">
+            <div class="section-title">Fiyat / Gece (1-10)</div>
+            <div class="scroll-box" id="odaPeriyotListesi">
+              <!-- JS dinamik olarak 10 periyot oluşturacak -->
+            </div>
+            <div id="odaToplamGece" style="font-size: 12px; font-weight: 700; color: #455A64; margin-top: 6px;">Toplam: 0 Gece</div>
+          </div>
+
+          <!-- Misafir -->
+          <div class="section-box" style="display: flex; flex-direction: column; justify-content: flex-start;">
+            <div class="section-title">Misafir</div>
+            <div class="input-line"><input type="number" id="txtYetiskin" value="2" min="1"><span style="font-size:11.5px; font-weight:600; width:55px;">Yetişkin</span></div>
+            <div class="input-line"><input type="number" id="txtCocuk712" value="0" min="0"><span style="font-size:11.5px; font-weight:600; width:55px;">7-12 Yaş</span></div>
+            <div class="input-line"><input type="number" id="txtCocuk06" value="0" min="0"><span style="font-size:11.5px; font-weight:600; width:55px;">0-6 Yaş</span></div>
+            <div class="pax-badge" id="lblPax">PAX: 2.0</div>
+            <label class="checkbox-row">
+              <input type="checkbox" id="chk012Ucretsiz"> 🎁 0-12 Yaş Ücr.
+            </label>
+          </div>
+        </div>
+
+        <div class="btn-grid">
+          <button class="btn-teklif" onclick="odaCiftTeklif()">ÇİFT TEKLİF (Ç)</button>
+          <button class="btn-hesapla" onclick="odaHesapla()">HESAPLA (H)</button>
+          <button class="btn-detay" onclick="odaDetaylar()">DETAYLAR (D)</button>
+          <button class="btn-temizle" onclick="odaTemizle()">TEMİZLE (T)</button>
+        </div>
+
+        <div class="result-box" id="odaSonuc">-</div>
+
+        <div class="footer">
+          <span class="switch-link" onclick="modulDegistir('villa')">⮌ Villa Modülüne Geç</span>
+          <span class="version-text">v26.09.30</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. VİLLA HESAPLAMA MODÜLÜ -->
+    <div id="villaModulu" class="hidden">
+      <div class="header">
+        <span>🏡 Villa Hesaplama</span>
+      </div>
+      <div class="content">
+        <select id="villaTipi" onchange="villaSecildi()"></select>
+
+        <div class="section-box">
+          <div class="section-title">Fiyat ve Gece Seçimi</div>
+          
+          <div class="input-line" style="margin-bottom: 8px;">
+            <span style="font-size:12px; font-weight:600; width:110px;">Dönem Fiyatı:</span>
+            <select id="villaFiyatSecim" onchange="villaFiyatAyarla()"></select>
+          </div>
+
+          <div class="input-line" style="margin-bottom: 8px;">
+            <span style="font-size:12px; font-weight:600; width:110px;">Günlük Fiyat (₺):</span>
+            <input type="number" id="villaFiyat" placeholder="₺ Günlük Fiyat">
+          </div>
+
+          <div class="input-line">
+            <span style="font-size:12px; font-weight:600; width:110px;">Gece Sayısı:</span>
+            <input type="number" id="villaGece" placeholder="Gece">
+          </div>
+        </div>
+
+        <div class="btn-grid">
+          <button class="btn-teklif" onclick="villaCiftTeklif()">ÇİFT TEKLİF (Ç)</button>
+          <button class="btn-hesapla" onclick="villaHesapla()">HESAPLA (H)</button>
+          <button class="btn-detay" onclick="villaDetaylar()">DETAYLAR (D)</button>
+          <button class="btn-temizle" onclick="villaTemizle()">TEMİZLE (T)</button>
+        </div>
+
+        <div class="result-box" id="villaSonuc">-</div>
+
+        <div class="footer">
+          <span class="switch-link" onclick="modulDegistir('oda')">⮌ Oda Modülüne Geç</span>
+          <span class="version-text">v26.09.30</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let odaVerileri = {};
+    let villaVerileri = {};
+
+    // 10 SATIRLIK GİRİŞ ALANINI OTOMATİK OLUŞTUR
+    const listeKonteyner = document.getElementById('odaPeriyotListesi');
+    for (let i = 1; i <= 10; i++) {
+      const line = document.createElement('div');
+      line.className = 'input-line';
+      line.innerHTML = `<label>${i}.</label><input type="number" class="fiyat" placeholder="Fiyat"><input type="number" class="gece" placeholder="Gece">`;
+      listeKonteyner.appendChild(line);
+    }
+
+    // ODAKLANDIĞINDA TÜMÜNÜ SEÇME (MOBİL İÇİN)
+    function inputSecimleriniBagla() {
+      document.querySelectorAll('input').forEach(input => {
+        input.onfocus = function() {
+          setTimeout(() => this.select(), 50);
+        };
+      });
+    }
+
+    // INI FORMATINDAKİ FİYATLAR.TXT'Yİ PARSE ETME
+    async function fiyatlariYukle() {
+      try {
+        const response = await fetch('fiyatlar.txt?v=' + Date.now());
+        if (!response.ok) throw new Error("Dosya okunamadı");
+        const metin = await response.text();
+
+        const satirlar = metin.split(/\r?\n/);
+        let aktifBolum = '';
+
+        odaVerileri = {};
+        villaVerileri = {};
+
+        satirlar.forEach(satir => {
+          satir = satir.trim();
+          if (!satir || satir.startsWith(';') || satir.startsWith('#')) return;
+
+          if (satir.startsWith('[') && satir.endsWith(']')) {
+            aktifBolum = satir.substring(1, satir.length - 1).trim();
+            if (aktifBolum.toLowerCase().includes('villa')) {
+              villaVerileri[aktifBolum] = { fiyatlar: {}, degisken: 0 };
+            } else {
+              odaVerileri[aktifBolum] = [];
+            }
+          } else if (aktifBolum && satir.includes('=')) {
+            const [anahtar, deger] = satir.split('=').map(s => s.trim());
+            const sayiDeger = parseFloat(deger) || 0;
+
+            if (aktifBolum.toLowerCase().includes('villa')) {
+              if (anahtar.startsWith('fiyat')) {
+                villaVerileri[aktifBolum].fiyatlar[anahtar] = sayiDeger;
+              } else if (anahtar === 'degisken') {
+                villaVerileri[aktifBolum].degisken = sayiDeger;
+              }
+            } else {
+              if (anahtar.startsWith('periyot')) {
+                const sira = parseInt(anahtar.replace('periyot', '')) - 1;
+                odaVerileri[aktifBolum][sira] = sayiDeger;
+              }
+            }
+          }
+        });
+
+        // Oda Seçim Kutusunu Doldur
+        const odaSelect = document.getElementById('odaTipi');
+        odaSelect.innerHTML = '';
+        Object.keys(odaVerileri).forEach(oda => {
+          const opt = document.createElement('option');
+          opt.value = oda;
+          opt.textContent = oda;
+          odaSelect.appendChild(opt);
+        });
+
+        // Villa Seçim Kutusunu Doldur
+        const villaSelect = document.getElementById('villaTipi');
+        villaSelect.innerHTML = '';
+        Object.keys(villaVerileri).forEach(v => {
+          const opt = document.createElement('option');
+          opt.value = v;
+          opt.textContent = v;
+          villaSelect.appendChild(opt);
+        });
+
+        odaSecildi();
+        villaSecildi();
+        inputSecimleriniBagla();
+
+      } catch (err) {
+        console.error("Fiyatlar yüklenirken hata:", err);
+      }
+    }
+
+    // ODA SEÇİMİ VE 10 PERİYODUN DOLMASI
+    function odaSecildi() {
+      const secilen = document.getElementById('odaTipi').value;
+      const liste = odaVerileri[secilen] || [];
+      const fiyatKutulari = document.querySelectorAll('.fiyat');
+
+      fiyatKutulari.forEach((kutu, i) => {
+        kutu.value = liste[i] !== undefined ? liste[i] : '';
+      });
+    }
+
+    // VİLLA SEÇİMİ VE FİYAT LİSTESİ
+    function villaSecildi() {
+      const secilen = document.getElementById('villaTipi').value;
+      const veri = villaVerileri[secilen];
+      const secimKutusu = document.getElementById('villaFiyatSecim');
+      secimKutusu.innerHTML = '';
+
+      if (veri && veri.fiyatlar) {
+        Object.keys(veri.fiyatlar).forEach((fKey, index) => {
+          const opt = document.createElement('option');
+          opt.value = veri.fiyatlar[fKey];
+          opt.textContent = `${index + 1}. Sezon (${veri.fiyatlar[fKey]} ₺)`;
+          secimKutusu.appendChild(opt);
+        });
+      }
+      villaFiyatAyarla();
+    }
+
+    function villaFiyatAyarla() {
+      const secilenFiyat = document.getElementById('villaFiyatSecim').value;
+      document.getElementById('villaFiyat').value = secilenFiyat;
+    }
+
+    // PAX HESAPLAMA
+    function paxHesapla() {
+      const yetiskin = parseFloat(document.getElementById('txtYetiskin').value) || 0;
+      const c712 = parseFloat(document.getElementById('txtCocuk712').value) || 0;
+      const ucretsiz = document.getElementById('chk012Ucretsiz').checked;
+
+      let pax = ucretsiz ? yetiskin : yetiskin + (c712 * 0.5);
+      document.getElementById('lblPax').innerText = 'PAX: ' + pax.toFixed(1);
+      return pax;
+    }
+
+    ['txtYetiskin', 'txtCocuk712', 'txtCocuk06'].forEach(id => {
+      document.getElementById(id).addEventListener('input', paxHesapla);
+    });
+    document.getElementById('chk012Ucretsiz').addEventListener('change', paxHesapla);
+
+    // ODA HESAPLAMA (10 PERİYOT DAHİL)
+    function odaHesapla() {
+      const pax = paxHesapla();
+      const ucretsiz = document.getElementById('chk012Ucretsiz').checked;
+      let katsayi = 1.0;
+      if (!ucretsiz) {
+        katsayi = pax / 2.0;
+        if (katsayi < 1.0) katsayi = 1.0;
+      }
+
+      const fiyatlar = document.querySelectorAll('.fiyat');
+      const geceler = document.querySelectorAll('.gece');
+      let toplamGece = 0;
+      let toplamTutar = 0;
+
+      for (let i = 0; i < 10; i++) {
+        const f = parseFloat(fiyatlar[i].value) || 0;
+        const g = parseInt(geceler[i].value) || 0;
+        if (f > 0 && g > 0) {
+          toplamGece += g;
+          toplamTutar += (f * g * katsayi);
+        }
+      }
+
+      document.getElementById('odaToplamGece').innerText = 'Toplam: ' + toplamGece + ' Gece';
+      const formatli = Math.round(toplamTutar).toLocaleString('tr-TR') + ' ₺';
+      document.getElementById('odaSonuc').innerText = formatli;
+      return { toplamTutar: formatli, toplamGece };
+    }
+
+    function odaCiftTeklif() {
+      const res = odaHesapla();
+      if (res.toplamTutar !== '0 ₺') {
+        const metin = `Nakit/Havale Fiyatı: ${res.toplamTutar}\nKredi Kartı Tek Çekim: ${res.toplamTutar}`;
+        navigator.clipboard.writeText(metin);
+        alert('Teklif panoya kopyalandı:\n\n' + metin);
+      }
+    }
+
+    function odaDetaylar() {
+      const oda = document.getElementById('odaTipi').value;
+      const y = document.getElementById('txtYetiskin').value;
+      const c1 = document.getElementById('txtCocuk712').value;
+      const c2 = document.getElementById('txtCocuk06').value;
+      const pax = document.getElementById('lblPax').innerText;
+      const tutar = document.getElementById('odaSonuc').innerText;
+      alert(`--- REZERVASYON DETAYI ---\nOda Türü: ${oda}\nMisafirler: ${y} Yetişkin, ${c1} (7-12 Yaş), ${c2} (0-6 Yaş)\n${pax}\nToplam Tutar: ${tutar}`);
+    }
+
+    function odaTemizle() {
+      document.querySelectorAll('#odaModulu input[type="number"].gece').forEach(i => i.value = '');
+      document.getElementById('txtYetiskin').value = '2';
+      document.getElementById('txtCocuk712').value = '0';
+      document.getElementById('txtCocuk06').value = '0';
+      document.getElementById('chk012Ucretsiz').checked = false;
+      document.getElementById('odaSonuc').innerText = '-';
+      document.getElementById('odaToplamGece').innerText = 'Toplam: 0 Gece';
+      paxHesapla();
+      odaSecildi();
+    }
+
+    // VİLLA HESAPLAMA (DEĞİŞKEN EK ÜCRET DAHİL)
+    function villaHesapla() {
+      const secilenVilla = document.getElementById('villaTipi').value;
+      const f = parseFloat(document.getElementById('villaFiyat').value) || 0;
+      const g = parseInt(document.getElementById('villaGece').value) || 0;
+      let toplam = f * g;
+
+      const degiskenTutar = (villaVerileri[secilenVilla] && villaVerileri[secilenVilla].degisken) || 0;
+
+      // 7 gecenin altındaysa dosyadaki değişken temizlik ücretini ekle
+      if (g > 0 && g < 7 && degiskenTutar > 0) {
+        toplam += degiskenTutar;
+      }
+
+      const formatli = Math.round(toplam).toLocaleString('tr-TR') + ' ₺';
+      document.getElementById('villaSonuc').innerText = formatli;
+      return { formatli, degiskenTutar, g };
+    }
+
+    function villaCiftTeklif() {
+      const res = villaHesapla();
+      if (res.formatli !== '0 ₺') {
+        const metin = `Villa Konaklama Teklifi: ${res.formatli}`;
+        navigator.clipboard.writeText(metin);
+        alert('Villa teklifi panoya kopyalandı:\n\n' + metin);
+      }
+    }
+
+    function villaDetaylar() {
+      const res = villaHesapla();
+      const secilen = document.getElementById('villaTipi').value;
+      let ekstra = (res.g < 7 && res.degiskenTutar > 0) ? `\n(7 gece altı konaklamalarda +${res.degiskenTutar.toLocaleString('tr-TR')} ₺ temizlik ücreti dahildir)` : '';
+      alert(`Villa Konaklama Detayı\nSeçim: ${secilen}\nToplam Gece: ${res.g}\nToplam Tutar: ${res.formatli}${ekstra}`);
+    }
+
+    function villaTemizle() {
+      document.getElementById('villaGece').value = '';
+      document.getElementById('villaSonuc').innerText = '-';
+      villaFiyatAyarla();
+    }
+
+    // MODÜLLER ARASI GEÇİŞ
+    function modulDegistir(hedef) {
+      if (hedef === 'villa') {
+        document.getElementById('odaModulu').classList.add('hidden');
+        document.getElementById('villaModulu').classList.remove('hidden');
+      } else {
+        document.getElementById('villaModulu').classList.add('hidden');
+        document.getElementById('odaModulu').classList.remove('hidden');
+      }
+    }
+
+    // Sayfa açıldığında INI dosyasını oku
+    fiyatlariYukle();
+  </script>
+</body>
+</html>

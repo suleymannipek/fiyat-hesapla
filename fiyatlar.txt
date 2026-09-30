@@ -1,0 +1,35 @@
+[Standart Suite]
+periyot1=2700
+periyot2=2800
+periyot3=2900
+periyot4=3000
+periyot5=3200
+periyot6=4250
+periyot7=3950
+periyot8=3750
+periyot9=3200
+periyot10=3200
+
+[Havuzlu Suite]
+periyot1=3200
+periyot2=3300
+periyot3=3400
+periyot4=3500
+periyot5=3700
+periyot6=4750
+periyot7=4450
+periyot8=4250
+periyot9=3700
+periyot10=3700
+
+[Luxury Villa]
+fiyat1=8000
+fiyat2=11000
+fiyat3=8000
+degisken=3000
+
+[Deluxe Villa]
+fiyat1=11000
+fiyat2=14000
+fiyat3=10000
+degisken=3000
