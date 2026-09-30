@@ -3,21 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Fiyat Hesapla</title>
+  <title>Oda Hesaplama</title>
   <style>
     :root {
-      --primary: #1976D2;
-      --success: #2E7D32;
-      --danger: #D32F2F;
-      --accent: #0288D1;
-      --bg: #F4F6F9;
+      --bg: #F0F2F5;
       --card-bg: #FFFFFF;
-      --border: #CFD8DC;
+      --border: #D1D5DB;
+      --text: #1F2937;
+      --muted: #6B7280;
+      --primary-blue: #0288D1;
+      --teklif-color: #0097A7;
+      --hesapla-color: #2E7D32;
+      --detay-color: #0288D1;
+      --temizle-color: #D32F2F;
     }
 
     * {
       box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 0;
       -webkit-tap-highlight-color: transparent;
@@ -27,180 +30,277 @@
       background-color: var(--bg);
       display: flex;
       justify-content: center;
-      padding: 10px;
+      padding: 8px;
     }
 
-    .app-card {
+    .window-card {
       background: var(--card-bg);
       width: 100%;
-      max-width: 440px;
-      border-radius: 14px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-      border: 1px solid var(--border);
+      max-width: 390px;
+      border-radius: 10px;
+      border: 1px solid #B0BEC5;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
       overflow: hidden;
       display: flex;
       flex-direction: column;
     }
 
-    .header {
-      background: #ECEFF1;
-      padding: 12px 14px;
-      font-weight: 700;
-      font-size: 16px;
+    /* Üst Başlık Çubuğu */
+    .title-bar {
+      background: #E8ECEF;
+      padding: 8px 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid #CFD8DC;
     }
 
-    .content {
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .row-2 {
-      display: grid;
-      grid-template-columns: 1.35fr 1fr;
-      gap: 10px;
-    }
-
-    .section-box {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 10px;
-      background: #FAFAFA;
-    }
-
-    .scroll-box {
-      max-height: 235px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-
-    .section-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: #455A64;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .input-line {
+    .title-left {
       display: flex;
       align-items: center;
-      gap: 5px;
-      margin-bottom: 5px;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 15px;
+      color: #263238;
     }
 
-    .input-line label {
-      font-size: 12px;
-      font-weight: 600;
-      width: 20px;
-      color: #546E7A;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 7px 8px;
-      border: 1px solid var(--border);
+    .app-icon {
+      width: 24px;
+      height: 24px;
       border-radius: 6px;
+      background: #E1F5FE;
+      color: #0288D1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+      border: 1px solid #B3E5FC;
+    }
+
+    /* Form İçeriği */
+    .form-body {
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .top-select-row {
+      display: grid;
+      grid-template-columns: 1fr 45px;
+      gap: 6px;
+    }
+
+    select, input[type="text"], input[type="number"] {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 5px 6px;
       font-size: 13.5px;
       outline: none;
       background: #FFF;
-      text-align: right;
+      color: var(--text);
     }
 
     select {
-      text-align: left;
       font-weight: 600;
     }
 
     input:focus, select:focus {
-      border-color: var(--primary);
+      border-color: #0288D1;
     }
 
-    .checkbox-row {
+    /* 2 Sütunlu Orta Bölüm */
+    .middle-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 8px;
+    }
+
+    .box-panel {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: #FAFAFA;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .box-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #374151;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .period-header {
+      display: flex;
+      justify-content: flex-end;
+      gap: 16px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #4B5563;
+      padding-right: 4px;
+      margin-bottom: 2px;
+    }
+
+    .line-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 4px;
+      margin-bottom: 3px;
+    }
+
+    .line-row label {
+      font-size: 12px;
+      font-weight: 600;
+      width: 18px;
+      color: #374151;
+    }
+
+    .line-row input {
+      text-align: right;
+      width: 100%;
+      padding: 4px;
+      font-size: 13px;
+    }
+
+    .period-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+      padding-top: 4px;
+    }
+
+    .total-nights {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1F2937;
+    }
+
+    .btn-page {
+      background: #0077D7;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-weight: 800;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* Misafir Bölümü */
+    .guest-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+
+    .guest-row input {
+      width: 50px;
+      text-align: center;
+      padding: 4px;
+      font-weight: 700;
+    }
+
+    .guest-row span {
       font-size: 12.5px;
       font-weight: 600;
-      margin-top: 6px;
-      cursor: pointer;
+      color: #374151;
     }
 
-    .checkbox-row input {
-      width: 17px;
-      height: 17px;
-    }
-
-    .pax-badge {
-      font-size: 14px;
+    .pax-text {
+      font-size: 15px;
       font-weight: 800;
       color: #0D47A1;
-      margin-top: 6px;
+      margin: 4px 0 2px 0;
     }
 
-    .btn-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    button {
-      padding: 11px;
-      font-size: 13px;
-      font-weight: 700;
-      border: none;
-      border-radius: 6px;
-      color: #FFF;
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1F2937;
+      margin-top: 4px;
       cursor: pointer;
     }
 
-    button:active {
+    .check-row input {
+      width: 15px;
+      height: 15px;
+    }
+
+    /* 4 Buton Grubu */
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .action-btn {
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 9px 4px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .action-btn:active {
       opacity: 0.85;
       transform: scale(0.98);
     }
 
-    .btn-teklif { background-color: var(--accent); }
-    .btn-hesapla { background-color: var(--success); }
-    .btn-detay { background-color: var(--primary); }
-    .btn-temizle { background-color: var(--danger); }
+    .btn-teklif { background-color: var(--teklif-color); }
+    .btn-hesapla { background-color: var(--hesapla-color); }
+    .btn-detaylar { background-color: var(--detay-color); }
+    .btn-temizle { background-color: var(--temizle-color); }
 
-    .result-box {
-      background: #ECEFF1;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px;
-      text-align: center;
-      font-size: 18px;
+    /* Sonuç Alanı */
+    .result-display {
+      background: #FFFFFF;
+      border: 1px solid #90CAF9;
+      border-radius: 4px;
+      padding: 6px;
+      text-align: left;
+      font-size: 13.5px;
       font-weight: 800;
-      color: #263238;
-      min-height: 42px;
+      color: #0D47A1;
+      min-height: 32px;
+      display: flex;
+      align-items: center;
     }
 
-    .footer {
+    /* Alt Çubuk */
+    .bottom-bar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding-top: 8px;
-      border-top: 1px solid var(--border);
+      justify-content: space-between;
+      padding-top: 2px;
     }
 
     .switch-link {
+      color: #0288D1;
       font-size: 12px;
       font-weight: 700;
-      color: var(--primary);
       text-decoration: underline;
       cursor: pointer;
     }
 
-    .version-text {
+    .version-tag {
       font-size: 11px;
-      color: #90A4AE;
+      color: #9E9E9E;
     }
 
     .hidden {
@@ -210,94 +310,132 @@
 </head>
 <body>
 
-  <div class="app-card">
+  <div class="window-card">
     
     <!-- 1. ODA HESAPLAMA MODÜLÜ -->
     <div id="odaModulu">
-      <div class="header">
-        <span>🏨 Oda Hesaplama</span>
+      <div class="title-bar">
+        <div class="title-left">
+          <div class="app-icon">oda</div>
+          <span>Oda Hesaplama</span>
+        </div>
+        <div style="font-size: 14px; color: #546E7A; cursor: pointer;" title="Pin">📌</div>
       </div>
-      <div class="content">
-        <select id="odaTipi" onchange="odaSecildi()"></select>
 
-        <div class="row-2">
-          <!-- 10 Periyotluk Fiyat & Gece -->
-          <div class="section-box">
-            <div class="section-title">Fiyat / Gece (1-10)</div>
-            <div class="scroll-box" id="odaPeriyotListesi">
-              <!-- JS dinamik olarak 10 periyot oluşturacak -->
+      <div class="form-body">
+        <!-- Oda Seçimi ve Yanındaki Kutu -->
+        <div class="top-select-row">
+          <select id="odaTipi" onchange="odaSecildi()"></select>
+          <input type="text" id="odaKodu" placeholder="">
+        </div>
+
+        <!-- 2 Sütunlu Alan -->
+        <div class="middle-grid">
+          <!-- Fiyat/Gece Paneli -->
+          <div class="box-panel">
+            <div class="box-title" id="lblPeriyotBaslik">Fiyat/Gece (1-5)</div>
+            <div class="period-header">
+              <span>FİYAT</span>
+              <span>GECE</span>
             </div>
-            <div id="odaToplamGece" style="font-size: 12px; font-weight: 700; color: #455A64; margin-top: 6px;">Toplam: 0 Gece</div>
+
+            <div id="periyotKonteyner">
+              <!-- JS ile 5 satır dinamik basılacak -->
+            </div>
+
+            <div class="period-footer">
+              <span class="total-nights" id="odaToplamGece">Toplam: 0 Gece</span>
+              <button class="btn-page" id="btnSayfa" onclick="sayfaDegistir()">&gt;&gt;</button>
+            </div>
           </div>
 
-          <!-- Misafir -->
-          <div class="section-box" style="display: flex; flex-direction: column; justify-content: flex-start;">
-            <div class="section-title">Misafir</div>
-            <div class="input-line"><input type="number" id="txtYetiskin" value="2" min="1"><span style="font-size:11.5px; font-weight:600; width:55px;">Yetişkin</span></div>
-            <div class="input-line"><input type="number" id="txtCocuk712" value="0" min="0"><span style="font-size:11.5px; font-weight:600; width:55px;">7-12 Yaş</span></div>
-            <div class="input-line"><input type="number" id="txtCocuk06" value="0" min="0"><span style="font-size:11.5px; font-weight:600; width:55px;">0-6 Yaş</span></div>
-            <div class="pax-badge" id="lblPax">PAX: 2.0</div>
-            <label class="checkbox-row">
-              <input type="checkbox" id="chk012Ucretsiz"> 🎁 0-12 Yaş Ücr.
+          <!-- Misafir Paneli -->
+          <div class="box-panel">
+            <div class="box-title">Misafir</div>
+
+            <div class="guest-row">
+              <input type="number" id="txtYetiskin" value="2" min="1">
+              <span>Yetişkin</span>
+            </div>
+            <div class="guest-row">
+              <input type="number" id="txtCocuk712" value="0" min="0">
+              <span>7-12 Yaş</span>
+            </div>
+            <div class="guest-row">
+              <input type="number" id="txtCocuk06" value="0" min="0">
+              <span>0-6 Yaş</span>
+            </div>
+
+            <div class="pax-text" id="lblPax">PAX: 2.0</div>
+
+            <label class="check-row">
+              <input type="checkbox" id="chk012Ucretsiz" checked> 🎁 0-12 Yaş Ücr.
+            </label>
+
+            <label class="check-row">
+              <input type="checkbox" id="chkDetayliKurallar"> Detaylı Kurallar
             </label>
           </div>
         </div>
 
-        <div class="btn-grid">
-          <button class="btn-teklif" onclick="odaCiftTeklif()">ÇİFT TEKLİF (Ç)</button>
-          <button class="btn-hesapla" onclick="odaHesapla()">HESAPLA (H)</button>
-          <button class="btn-detay" onclick="odaDetaylar()">DETAYLAR (D)</button>
-          <button class="btn-temizle" onclick="odaTemizle()">TEMİZLE (T)</button>
+        <!-- 4 İşlem Butonu -->
+        <div class="button-grid">
+          <button class="action-btn btn-teklif" onclick="odaCiftTeklif()">ÇİFT TEKLİF (Ç)</button>
+          <button class="action-btn btn-hesapla" onclick="odaHesapla()">🗎 HESAPLA (H)</button>
+          <button class="action-btn btn-detaylar" onclick="odaDetaylar()">🗎 DETAYLAR (D)</button>
+          <button class="action-btn btn-temizle" onclick="odaTemizle()">🖋 TEMİZLE (T)</button>
         </div>
 
-        <div class="result-box" id="odaSonuc">-</div>
+        <!-- Sonuç Şeridi -->
+        <div class="result-display" id="odaSonuc">Top: 0 TL | Ort: 0 TL</div>
 
-        <div class="footer">
-          <span class="switch-link" onclick="modulDegistir('villa')">⮌ Villa Modülüne Geç</span>
-          <span class="version-text">v26.09.30</span>
+        <!-- Alt Menü -->
+        <div class="bottom-bar">
+          <span class="switch-link" onclick="modulDegistir('villa')">⮌ Villa Rezervasyon Modülüne Dön</span>
+          <span class="version-tag">Mobil v1.0</span>
         </div>
       </div>
     </div>
 
     <!-- 2. VİLLA HESAPLAMA MODÜLÜ -->
     <div id="villaModulu" class="hidden">
-      <div class="header">
-        <span>🏡 Villa Hesaplama</span>
+      <div class="title-bar">
+        <div class="title-left">
+          <div class="app-icon" style="background:#E8F5E9; color:#2E7D32; border-color:#C8E6C9;">villa</div>
+          <span>Villa Hesaplama</span>
+        </div>
       </div>
-      <div class="content">
+
+      <div class="form-body">
         <select id="villaTipi" onchange="villaSecildi()"></select>
 
-        <div class="section-box">
-          <div class="section-title">Fiyat ve Gece Seçimi</div>
-          
-          <div class="input-line" style="margin-bottom: 8px;">
-            <span style="font-size:12px; font-weight:600; width:110px;">Dönem Fiyatı:</span>
+        <div class="box-panel" style="gap: 8px;">
+          <div class="line-row">
+            <span style="font-size:12.5px; font-weight:600; width:110px;">Dönem Fiyatı:</span>
             <select id="villaFiyatSecim" onchange="villaFiyatAyarla()"></select>
           </div>
-
-          <div class="input-line" style="margin-bottom: 8px;">
-            <span style="font-size:12px; font-weight:600; width:110px;">Günlük Fiyat (₺):</span>
-            <input type="number" id="villaFiyat" placeholder="₺ Günlük Fiyat">
+          <div class="line-row">
+            <span style="font-size:12.5px; font-weight:600; width:110px;">Günlük Fiyat (₺):</span>
+            <input type="number" id="villaFiyat">
           </div>
-
-          <div class="input-line">
-            <span style="font-size:12px; font-weight:600; width:110px;">Gece Sayısı:</span>
-            <input type="number" id="villaGece" placeholder="Gece">
+          <div class="line-row">
+            <span style="font-size:12.5px; font-weight:600; width:110px;">Gece Sayısı:</span>
+            <input type="number" id="villaGece">
           </div>
         </div>
 
-        <div class="btn-grid">
-          <button class="btn-teklif" onclick="villaCiftTeklif()">ÇİFT TEKLİF (Ç)</button>
-          <button class="btn-hesapla" onclick="villaHesapla()">HESAPLA (H)</button>
-          <button class="btn-detay" onclick="villaDetaylar()">DETAYLAR (D)</button>
-          <button class="btn-temizle" onclick="villaTemizle()">TEMİZLE (T)</button>
+        <div class="button-grid">
+          <button class="action-btn btn-teklif" onclick="villaCiftTeklif()">ÇİFT TEKLİF (Ç)</button>
+          <button class="action-btn btn-hesapla" onclick="villaHesapla()">🗎 HESAPLA (H)</button>
+          <button class="action-btn btn-detaylar" onclick="villaDetaylar()">🗎 DETAYLAR (D)</button>
+          <button class="action-btn btn-temizle" onclick="villaTemizle()">🖋 TEMİZLE (T)</button>
         </div>
 
-        <div class="result-box" id="villaSonuc">-</div>
+        <div class="result-display" id="villaSonuc">Top: 0 TL</div>
 
-        <div class="footer">
-          <span class="switch-link" onclick="modulDegistir('oda')">⮌ Oda Modülüne Geç</span>
-          <span class="version-text">v26.09.30</span>
+        <div class="bottom-bar">
+          <span class="switch-link" onclick="modulDegistir('oda')">⮌ Oda Hesaplama Modülüne Dön</span>
+          <span class="version-tag">Mobil v1.0</span>
         </div>
       </div>
     </div>
@@ -305,37 +443,71 @@
   </div>
 
   <script>
+    let aktifSayfa = 1; // 1: (1-5), 2: (6-10)
+    let periyotFiyatlari = Array(10).fill(0);
+    let periyotGeceleri = Array(10).fill('');
+
     let odaVerileri = {};
     let villaVerileri = {};
 
-    // 10 SATIRLIK GİRİŞ ALANINI OTOMATİK OLUŞTUR
-    const listeKonteyner = document.getElementById('odaPeriyotListesi');
-    for (let i = 1; i <= 10; i++) {
-      const line = document.createElement('div');
-      line.className = 'input-line';
-      line.innerHTML = `<label>${i}.</label><input type="number" class="fiyat" placeholder="Fiyat"><input type="number" class="gece" placeholder="Gece">`;
-      listeKonteyner.appendChild(line);
-    }
+    // 5 SATIRLIK ARAYÜZÜ OLUŞTUR
+    function periyotlariCiz() {
+      const konteyner = document.getElementById('periyotKonteyner');
+      konteyner.innerHTML = '';
+      const baslangic = aktifSayfa === 1 ? 0 : 5;
 
-    // ODAKLANDIĞINDA TÜMÜNÜ SEÇME (MOBİL İÇİN)
-    function inputSecimleriniBagla() {
-      document.querySelectorAll('input').forEach(input => {
-        input.onfocus = function() {
-          setTimeout(() => this.select(), 50);
+      document.getElementById('lblPeriyotBaslik').innerText = aktifSayfa === 1 ? 'Fiyat/Gece (1-5)' : 'Fiyat/Gece (6-10)';
+      document.getElementById('btnSayfa').innerText = aktifSayfa === 1 ? '>>' : '<<';
+
+      for (let i = 0; i < 5; i++) {
+        const index = baslangic + i;
+        const row = document.createElement('div');
+        row.className = 'line-row';
+        row.innerHTML = `
+          <label>${index + 1}.</label>
+          <input type="number" class="p-fiyat" data-idx="${index}" value="${periyotFiyatlari[index] || ''}">
+          <input type="number" class="p-gece" data-idx="${index}" value="${periyotGeceleri[index] || ''}">
+        `;
+        konteyner.appendChild(row);
+      }
+
+      // Değişiklikleri diziye yazma
+      document.querySelectorAll('.p-fiyat').forEach(inp => {
+        inp.oninput = (e) => periyotFiyatlari[e.target.dataset.idx] = parseFloat(e.target.value) || 0;
+      });
+      document.querySelectorAll('.p-gece').forEach(inp => {
+        inp.oninput = (e) => {
+          periyotGeceleri[e.target.dataset.idx] = e.target.value;
+          geceToplamiGuncelle();
         };
+      });
+
+      // Tıklanınca seçme
+      document.querySelectorAll('input').forEach(inp => {
+        inp.onfocus = function() { setTimeout(() => this.select(), 50); };
       });
     }
 
-    // INI FORMATINDAKİ FİYATLAR.TXT'Yİ PARSE ETME
+    function sayfaDegistir() {
+      aktifSayfa = aktifSayfa === 1 ? 2 : 1;
+      periyotlariCiz();
+    }
+
+    function geceToplamiGuncelle() {
+      let topGece = periyotGeceleri.reduce((toplam, g) => toplam + (parseInt(g) || 0), 0);
+      document.getElementById('odaToplamGece').innerText = `Toplam: ${topGece} Gece`;
+      return topGece;
+    }
+
+    // INI DOSYASINI OKUMA
     async function fiyatlariYukle() {
       try {
         const response = await fetch('fiyatlar.txt?v=' + Date.now());
-        if (!response.ok) throw new Error("Dosya okunamadı");
+        if (!response.ok) throw new Error("Dosya bulunamadı");
         const metin = await response.text();
 
         const satirlar = metin.split(/\r?\n/);
         let aktifBolum = '';
-
         odaVerileri = {};
         villaVerileri = {};
 
@@ -348,38 +520,34 @@
             if (aktifBolum.toLowerCase().includes('villa')) {
               villaVerileri[aktifBolum] = { fiyatlar: {}, degisken: 0 };
             } else {
-              odaVerileri[aktifBolum] = [];
+              odaVerileri[aktifBolum] = Array(10).fill(0);
             }
           } else if (aktifBolum && satir.includes('=')) {
             const [anahtar, deger] = satir.split('=').map(s => s.trim());
-            const sayiDeger = parseFloat(deger) || 0;
+            const sayi = parseFloat(deger) || 0;
 
             if (aktifBolum.toLowerCase().includes('villa')) {
-              if (anahtar.startsWith('fiyat')) {
-                villaVerileri[aktifBolum].fiyatlar[anahtar] = sayiDeger;
-              } else if (anahtar === 'degisken') {
-                villaVerileri[aktifBolum].degisken = sayiDeger;
-              }
+              if (anahtar.startsWith('fiyat')) villaVerileri[aktifBolum].fiyatlar[anahtar] = sayi;
+              if (anahtar === 'degisken') villaVerileri[aktifBolum].degisken = sayi;
             } else {
               if (anahtar.startsWith('periyot')) {
-                const sira = parseInt(anahtar.replace('periyot', '')) - 1;
-                odaVerileri[aktifBolum][sira] = sayiDeger;
+                const s = parseInt(anahtar.replace('periyot', '')) - 1;
+                if (s >= 0 && s < 10) odaVerileri[aktifBolum][s] = sayi;
               }
             }
           }
         });
 
-        // Oda Seçim Kutusunu Doldur
+        // Seçim kutularını doldur
         const odaSelect = document.getElementById('odaTipi');
         odaSelect.innerHTML = '';
-        Object.keys(odaVerileri).forEach(oda => {
+        Object.keys(odaVerileri).forEach(o => {
           const opt = document.createElement('option');
-          opt.value = oda;
-          opt.textContent = oda;
+          opt.value = o;
+          opt.textContent = o;
           odaSelect.appendChild(opt);
         });
 
-        // Villa Seçim Kutusunu Doldur
         const villaSelect = document.getElementById('villaTipi');
         villaSelect.innerHTML = '';
         Object.keys(villaVerileri).forEach(v => {
@@ -391,54 +559,28 @@
 
         odaSecildi();
         villaSecildi();
-        inputSecimleriniBagla();
 
-      } catch (err) {
-        console.error("Fiyatlar yüklenirken hata:", err);
+      } catch (e) {
+        console.log("fiyatlar.txt okunamadı, varsayılan çalışıyor.");
+        periyotlariCiz();
       }
     }
 
-    // ODA SEÇİMİ VE 10 PERİYODUN DOLMASI
     function odaSecildi() {
       const secilen = document.getElementById('odaTipi').value;
-      const liste = odaVerileri[secilen] || [];
-      const fiyatKutulari = document.querySelectorAll('.fiyat');
-
-      fiyatKutulari.forEach((kutu, i) => {
-        kutu.value = liste[i] !== undefined ? liste[i] : '';
-      });
-    }
-
-    // VİLLA SEÇİMİ VE FİYAT LİSTESİ
-    function villaSecildi() {
-      const secilen = document.getElementById('villaTipi').value;
-      const veri = villaVerileri[secilen];
-      const secimKutusu = document.getElementById('villaFiyatSecim');
-      secimKutusu.innerHTML = '';
-
-      if (veri && veri.fiyatlar) {
-        Object.keys(veri.fiyatlar).forEach((fKey, index) => {
-          const opt = document.createElement('option');
-          opt.value = veri.fiyatlar[fKey];
-          opt.textContent = `${index + 1}. Sezon (${veri.fiyatlar[fKey]} ₺)`;
-          secimKutusu.appendChild(opt);
-        });
+      if (odaVerileri[secilen]) {
+        periyotFiyatlari = [...odaVerileri[secilen]];
       }
-      villaFiyatAyarla();
-    }
-
-    function villaFiyatAyarla() {
-      const secilenFiyat = document.getElementById('villaFiyatSecim').value;
-      document.getElementById('villaFiyat').value = secilenFiyat;
+      periyotlariCiz();
     }
 
     // PAX HESAPLAMA
     function paxHesapla() {
-      const yetiskin = parseFloat(document.getElementById('txtYetiskin').value) || 0;
+      const y = parseFloat(document.getElementById('txtYetiskin').value) || 0;
       const c712 = parseFloat(document.getElementById('txtCocuk712').value) || 0;
-      const ucretsiz = document.getElementById('chk012Ucretsiz').checked;
+      const ucr = document.getElementById('chk012Ucretsiz').checked;
 
-      let pax = ucretsiz ? yetiskin : yetiskin + (c712 * 0.5);
+      let pax = ucr ? y : y + (c712 * 0.5);
       document.getElementById('lblPax').innerText = 'PAX: ' + pax.toFixed(1);
       return pax;
     }
@@ -448,40 +590,39 @@
     });
     document.getElementById('chk012Ucretsiz').addEventListener('change', paxHesapla);
 
-    // ODA HESAPLAMA (10 PERİYOT DAHİL)
+    // ODA HESAPLAMA
     function odaHesapla() {
       const pax = paxHesapla();
-      const ucretsiz = document.getElementById('chk012Ucretsiz').checked;
+      const ucr = document.getElementById('chk012Ucretsiz').checked;
       let katsayi = 1.0;
-      if (!ucretsiz) {
+      if (!ucr) {
         katsayi = pax / 2.0;
         if (katsayi < 1.0) katsayi = 1.0;
       }
 
-      const fiyatlar = document.querySelectorAll('.fiyat');
-      const geceler = document.querySelectorAll('.gece');
       let toplamGece = 0;
       let toplamTutar = 0;
 
       for (let i = 0; i < 10; i++) {
-        const f = parseFloat(fiyatlar[i].value) || 0;
-        const g = parseInt(geceler[i].value) || 0;
+        const f = periyotFiyatlari[i] || 0;
+        const g = parseInt(periyotGeceleri[i]) || 0;
         if (f > 0 && g > 0) {
           toplamGece += g;
           toplamTutar += (f * g * katsayi);
         }
       }
 
-      document.getElementById('odaToplamGece').innerText = 'Toplam: ' + toplamGece + ' Gece';
-      const formatli = Math.round(toplamTutar).toLocaleString('tr-TR') + ' ₺';
-      document.getElementById('odaSonuc').innerText = formatli;
-      return { toplamTutar: formatli, toplamGece };
+      const ortalama = toplamGece > 0 ? (toplamTutar / toplamGece) : 0;
+      const sonucMetni = `Top: ${Math.round(toplamTutar).toLocaleString('tr-TR')} TL | Ort: ${Math.round(ortalama).toLocaleString('tr-TR')} TL`;
+      
+      document.getElementById('odaSonuc').innerText = sonucMetni;
+      return { toplamTutar, ortalama, toplamGece, sonucMetni };
     }
 
     function odaCiftTeklif() {
       const res = odaHesapla();
-      if (res.toplamTutar !== '0 ₺') {
-        const metin = `Nakit/Havale Fiyatı: ${res.toplamTutar}\nKredi Kartı Tek Çekim: ${res.toplamTutar}`;
+      if (res.toplamTutar > 0) {
+        const metin = `Nakit/Havale Fiyatı: ${Math.round(res.toplamTutar).toLocaleString('tr-TR')} TL\nKredi Kartı Tek Çekim: ${Math.round(res.toplamTutar).toLocaleString('tr-TR')} TL`;
         navigator.clipboard.writeText(metin);
         alert('Teklif panoya kopyalandı:\n\n' + metin);
       }
@@ -489,68 +630,81 @@
 
     function odaDetaylar() {
       const oda = document.getElementById('odaTipi').value;
-      const y = document.getElementById('txtYetiskin').value;
-      const c1 = document.getElementById('txtCocuk712').value;
-      const c2 = document.getElementById('txtCocuk06').value;
-      const pax = document.getElementById('lblPax').innerText;
-      const tutar = document.getElementById('odaSonuc').innerText;
-      alert(`--- REZERVASYON DETAYI ---\nOda Türü: ${oda}\nMisafirler: ${y} Yetişkin, ${c1} (7-12 Yaş), ${c2} (0-6 Yaş)\n${pax}\nToplam Tutar: ${tutar}`);
+      const res = odaHesapla();
+      alert(`--- REZERVASYON DETAYI ---\nOda: ${oda}\nToplam Gece: ${res.toplamGece}\n${res.sonucMetni}`);
     }
 
     function odaTemizle() {
-      document.querySelectorAll('#odaModulu input[type="number"].gece').forEach(i => i.value = '');
+      periyotGeceleri = Array(10).fill('');
       document.getElementById('txtYetiskin').value = '2';
       document.getElementById('txtCocuk712').value = '0';
       document.getElementById('txtCocuk06').value = '0';
-      document.getElementById('chk012Ucretsiz').checked = false;
-      document.getElementById('odaSonuc').innerText = '-';
-      document.getElementById('odaToplamGece').innerText = 'Toplam: 0 Gece';
+      document.getElementById('chk012Ucretsiz').checked = true;
+      document.getElementById('chkDetayliKurallar').checked = false;
+      document.getElementById('odaSonuc').innerText = 'Top: 0 TL | Ort: 0 TL';
+      geceToplamiGuncelle();
       paxHesapla();
-      odaSecildi();
+      periyotlariCiz();
     }
 
-    // VİLLA HESAPLAMA (DEĞİŞKEN EK ÜCRET DAHİL)
+    // VİLLA MODÜLÜ İŞLEMLERİ
+    function villaSecildi() {
+      const secilen = document.getElementById('villaTipi').value;
+      const veri = villaVerileri[secilen];
+      const secim = document.getElementById('villaFiyatSecim');
+      secim.innerHTML = '';
+
+      if (veri && veri.fiyatlar) {
+        Object.keys(veri.fiyatlar).forEach((k, i) => {
+          const opt = document.createElement('option');
+          opt.value = veri.fiyatlar[k];
+          opt.textContent = `${i + 1}. Sezon (${veri.fiyatlar[k]} ₺)`;
+          secim.appendChild(opt);
+        });
+      }
+      villaFiyatAyarla();
+    }
+
+    function villaFiyatAyarla() {
+      document.getElementById('villaFiyat').value = document.getElementById('villaFiyatSecim').value || '';
+    }
+
     function villaHesapla() {
-      const secilenVilla = document.getElementById('villaTipi').value;
       const f = parseFloat(document.getElementById('villaFiyat').value) || 0;
       const g = parseInt(document.getElementById('villaGece').value) || 0;
-      let toplam = f * g;
+      const secilen = document.getElementById('villaTipi').value;
+      const degisken = (villaVerileri[secilen] && villaVerileri[secilen].degisken) || 0;
 
-      const degiskenTutar = (villaVerileri[secilenVilla] && villaVerileri[secilenVilla].degisken) || 0;
+      let top = f * g;
+      if (g > 0 && g < 7 && degisken > 0) top += degisken;
 
-      // 7 gecenin altındaysa dosyadaki değişken temizlik ücretini ekle
-      if (g > 0 && g < 7 && degiskenTutar > 0) {
-        toplam += degiskenTutar;
-      }
-
-      const formatli = Math.round(toplam).toLocaleString('tr-TR') + ' ₺';
-      document.getElementById('villaSonuc').innerText = formatli;
-      return { formatli, degiskenTutar, g };
+      const metin = `Top: ${Math.round(top).toLocaleString('tr-TR')} TL`;
+      document.getElementById('villaSonuc').innerText = metin;
+      return { top, g, degisken, metin };
     }
 
     function villaCiftTeklif() {
-      const res = villaHesapla();
-      if (res.formatli !== '0 ₺') {
-        const metin = `Villa Konaklama Teklifi: ${res.formatli}`;
+      const r = villaHesapla();
+      if (r.top > 0) {
+        const metin = `Villa Konaklama Teklifi: ${Math.round(r.top).toLocaleString('tr-TR')} TL`;
         navigator.clipboard.writeText(metin);
-        alert('Villa teklifi panoya kopyalandı:\n\n' + metin);
+        alert('Teklif panoya kopyalandı:\n\n' + metin);
       }
     }
 
     function villaDetaylar() {
-      const res = villaHesapla();
-      const secilen = document.getElementById('villaTipi').value;
-      let ekstra = (res.g < 7 && res.degiskenTutar > 0) ? `\n(7 gece altı konaklamalarda +${res.degiskenTutar.toLocaleString('tr-TR')} ₺ temizlik ücreti dahildir)` : '';
-      alert(`Villa Konaklama Detayı\nSeçim: ${secilen}\nToplam Gece: ${res.g}\nToplam Tutar: ${res.formatli}${ekstra}`);
+      const r = villaHesapla();
+      let ekstra = (r.g < 7 && r.degisken > 0) ? `\n(7 gece altı +${r.degisken} TL temizlik ücreti eklendi)` : '';
+      alert(`Villa Detayı\nToplam Gece: ${r.g}\n${r.metin}${ekstra}`);
     }
 
     function villaTemizle() {
       document.getElementById('villaGece').value = '';
-      document.getElementById('villaSonuc').innerText = '-';
+      document.getElementById('villaSonuc').innerText = 'Top: 0 TL';
       villaFiyatAyarla();
     }
 
-    // MODÜLLER ARASI GEÇİŞ
+    // MODÜL DEĞİŞTİRME
     function modulDegistir(hedef) {
       if (hedef === 'villa') {
         document.getElementById('odaModulu').classList.add('hidden');
@@ -561,7 +715,8 @@
       }
     }
 
-    // Sayfa açıldığında INI dosyasını oku
+    // BAŞLATMA
+    periyotlariCiz();
     fiyatlariYukle();
   </script>
 </body>
